@@ -1,0 +1,52 @@
+# Uncomment the next line to define a global platform for your project
+# platform :ios, '9.0'
+
+target 'FileManagerHomework' do
+  # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
+  use_frameworks!
+
+  # Pods for FileManagerHomework
+  pod 'SwiftyJSON'
+  pod 'Alamofire', '~> 4.0'
+  pod '//  Mark Function Fetch Data
+    func fetchData(page: Int, limit: Int) {
+        let url = URL(string:  "\(Constant.GlobalConstants.ARTICLE)?page=\(page)&limit=\(limit)")
+        var request = URLRequest(url: url!)
+        request.setValue("\(Constant.GlobalConstants.headers)", forHTTPHeaderField: "Authorization")
+        request.httpMethod = "GET"
+        
+        let getTask = URLSession.shared.dataTask(with: request) {
+            (data, response, error) in
+            
+            if error != nil {
+                
+                print(error)
+                
+            } else {
+                
+                if let urlContent = data {
+                    
+                    do {
+                        
+                        let jsonResult = try JSONSerialization.jsonObject(with: urlContent, options: JSONSerialization.ReadingOptions.mutableContainers) as! [String:Any]
+
+                        
+                        let jsonData = jsonResult["DATA"] as! [AnyObject]
+                        
+                        print(jsonResult["DATA"] as! [AnyObject])
+                        for responseData in jsonData {
+                           
+                            self.articles.append(Article(JSON: responseData as! [String : Any])!)
+                            
+                        }
+                        
+                        //  Notify to presenter
+                        self.homeTableViewPresenterInterface?.responseData(data: self.articles)
+    
+                    } catch {
+                        
+                        print("JSON Processing Failed")
+                        
+                    }
+      
+end
